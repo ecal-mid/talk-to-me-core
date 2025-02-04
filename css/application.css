@@ -259,6 +259,7 @@ input[type='number'] {
 .led.red {
   background: #ff0000;
   box-shadow: 0 0 10px #ff0000;
+  color: white;
 }
 
 .led.green {
@@ -269,6 +270,7 @@ input[type='number'] {
 .led.blue {
   background: #0000ff;
   box-shadow: 0 0 10px #0000ff;
+  color: white;
 }
 
 .led.magenta {
