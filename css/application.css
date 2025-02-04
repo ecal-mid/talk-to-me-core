@@ -425,7 +425,19 @@ input[type='number'] {
   font-style: italic;
 }
 
-/* Credit line */
+/* GitHub link */
+.github-link {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  color: #515152;
+  transition: color 0.2s;
+}
+
+.github-link:hover {
+  color: #515152;
+}
+
 .credit-line {
   text-align: left;
   font-size: 14px;
