@@ -18,7 +18,7 @@ export default class TalkMachine {
     this.pressStartTime = null;
     this.isPressed = false;
 
-    this.version = '1.5.0';
+    this.version = '1.6.0';
     this.versionDisplay = document.querySelector('#version');
     this.maxLeds = 10;
 
