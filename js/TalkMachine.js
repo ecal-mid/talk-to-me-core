@@ -18,7 +18,7 @@ export default class TalkMachine {
     this.pressStartTime = null;
     this.isPressed = false;
 
-    this.version = '1.6.0';
+    this.version = '1.7.0';
     this.versionDisplay = document.querySelector('#version');
     this.maxLeds = 10;
 
@@ -319,13 +319,16 @@ export default class TalkMachine {
   /**
    * Change color of a specific LED
    * @public
-   * @param {number} led_index - Index of the LED
+   * @param {number} led_index - Index of the LED (0)
    * @param {string} led_color - Color name from: black, white, red, green, blue, magenta, yellow, cyan, orange, purple, pink
    * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
   ledChangeColor(led_index, led_color, led_effect = 0) {
     const led_color_code = this.colorLeds[led_color];
-    this.sendCommandToUsb('L' + led_index + led_color_code + led_effect);
+    const led_index_leading_zero = led_index < 10 ? '0' + led_index : led_index;
+    this.sendCommandToUsb(
+      'L' + led_index_leading_zero + led_color_code + led_effect
+    );
     this.ui.setLedState(led_index, led_color, led_effect);
   }
 
@@ -336,10 +339,12 @@ export default class TalkMachine {
    * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
   ledsAllChangeColor(led_color, led_effect = 0) {
-    this.sendCommandToUsb('Lx000');
     for (let i = 0; i < this.maxLeds; i++) {
       const led_color_code = this.colorLeds[led_color];
-      this.sendCommandToUsb('L' + i + led_color_code + led_effect);
+      const led_index_leading_zero = i < 10 ? '0' + i : i;
+      this.sendCommandToUsb(
+        'L' + led_index_leading_zero + led_color_code + led_effect
+      );
       this.ui.setLedState(i, led_color, led_effect);
     }
   }
@@ -349,7 +354,7 @@ export default class TalkMachine {
    * @public
    */
   ledsAllOff() {
-    this.sendCommandToUsb('Lx000');
+    this.sendCommandToUsb('Lx0000');
     this.ui.turnOffAllLeds();
   }
 
@@ -360,8 +365,9 @@ export default class TalkMachine {
    * @param {number} r - Red value (0-255)
    * @param {number} g - Green value (0-255)
    * @param {number} b - Blue value (0-255)
+   * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
-  ledChangeRGB(led_index = 0, r = 255, g = 255, b = 255) {
+  ledChangeRGB(led_index = 0, r = 255, g = 255, b = 255, led_effect = 0) {
     let led_index_zeroed;
     if (led_index < 10) {
       led_index_zeroed = '0' + led_index;
@@ -377,8 +383,8 @@ export default class TalkMachine {
     if (b.length == 1) b = '0' + b;
 
     const hex_color = r + g + b;
-    this.sendCommandToUsb('H' + led_index_zeroed + hex_color);
-    this.ui.setLedState(led_index, '#' + hex_color, 0);
+    this.sendCommandToUsb('H' + led_index_zeroed + hex_color + led_effect);
+    this.ui.setLedState(led_index, '#' + hex_color, led_effect);
   }
 
   /**
@@ -387,8 +393,9 @@ export default class TalkMachine {
    * @param {number} r - Red value (0-255)
    * @param {number} g - Green value (0-255)
    * @param {number} b - Blue value (0-255)
+   * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
-  ledsAllChangeRGB(r = 255, g = 255, b = 255) {
+  ledsAllChangeRGB(r = 255, g = 255, b = 255, led_effect = 0) {
     r = r.toString(16);
     g = g.toString(16);
     b = b.toString(16);
@@ -405,8 +412,8 @@ export default class TalkMachine {
       } else {
         i_zeroed = i;
       }
-      this.sendCommandToUsb('H' + i_zeroed + hex_color);
-      this.ui.setLedState(i, '#' + hex_color, 0);
+      this.sendCommandToUsb('H' + i_zeroed + hex_color + led_effect);
+      this.ui.setLedState(i, '#' + hex_color, led_effect);
     }
   }
 
