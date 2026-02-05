@@ -6,9 +6,7 @@
 
   Support:
   10  digital inputs (Buttons)
-  1   analog input (potentimeter)
-  10  Neopixels as output
-  1 servo as output
+  1-99  Neopixels as output
 
 **********************************************************************/
 
@@ -246,13 +244,6 @@ void initAllLedsPixels()
   pixels.show();
 }
 
-void setServo(String command)
-{
-  int angle = command.substring(2, 5).toInt();
-  Serial.println(angle);
-  myservo.write(angle);
-}
-
 /**
    splitColor() - Receive a uint32_t value, and spread into bits.
 */
@@ -309,10 +300,6 @@ void loop()
     if (command_code == "H")
     { // LED HEX
       setLedPixelHEX(command);
-    }
-    if (command_code == "M")
-    { // Motor (servo)
-      setServo(command);
     }
   }
 
