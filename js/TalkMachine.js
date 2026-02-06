@@ -33,7 +33,7 @@ export default class TalkMachine {
     this.webUsbManager = new WebUsbManager(
       this,
       this.ui.connectButton,
-      this.ui.statusDisplay
+      this.ui.statusDisplay,
     );
     this.webUsbManager.setLogger(this.fancyLogger);
 
@@ -87,7 +87,7 @@ export default class TalkMachine {
     window.dispatchEvent(
       new CustomEvent('TextToSpeechReady', {
         detail: {},
-      })
+      }),
     );
   }
 
@@ -95,18 +95,38 @@ export default class TalkMachine {
    * Speak the provided text with given options
    * @public
    * @param {string} text - Text to be spoken
-   * @param {Array} options - [voiceIndex, pitch, rate]
+   * @param {Array} options - [voiceIndex or languageCode, pitch, rate]
+   *                          voiceIndex can be a number (0, 1, 2...) or a language code string ('en-US', 'fr-FR', etc.)
    */
-  speechText(text, options = [0, 1, 1]) {
-    const voice = options[0];
+  speechText(text, options = ['en-US', 1, 1]) {
+    const voiceParam = options[0];
     const pitch = options[1];
     const rate = options[2];
+
+    // Determine voice: if string, find by language code; if number, use as index
+    let selectedVoice;
+    if (typeof voiceParam === 'string') {
+      // Find first voice matching the language code
+      selectedVoice = this.speechVoices.find((v) =>
+        v.lang.startsWith(voiceParam),
+      );
+      if (!selectedVoice) {
+        // Fallback to first available voice if language not found
+        this.fancyLogger.logWarning(
+          `Voice for language "${voiceParam}" not found, using default voice`,
+        );
+        selectedVoice = this.speechVoices[0];
+      }
+    } else {
+      // Use numeric index
+      selectedVoice = this.speechVoices[voiceParam] || this.speechVoices[0];
+    }
 
     // Cancel any ongoing speech
     this.speechCancel();
 
     this.speechUtterance = new SpeechSynthesisUtterance(text);
-    this.speechUtterance.voice = this.speechVoices[voice];
+    this.speechUtterance.voice = selectedVoice;
     this.speechUtterance.pitch = pitch;
     this.speechUtterance.rate = rate;
 
@@ -214,7 +234,7 @@ export default class TalkMachine {
     this.pressStartTime = Date.now();
     this.isPressed = true;
     this.fancyLogger.logButton(
-      button + ' pressed' + (simulated ? ' (simulated)' : '')
+      button + ' pressed' + (simulated ? ' (simulated)' : ''),
     );
 
     // Call child class implementation
@@ -240,13 +260,13 @@ export default class TalkMachine {
     if (pressDuration >= this.longPressDelay) {
       // Long press detected
       this.fancyLogger.logButton(
-        button + ' longpress' + (simulated ? ' (simulated)' : '')
+        button + ' longpress' + (simulated ? ' (simulated)' : ''),
       );
       this._handleButtonLongPressed(button, simulated);
     } else {
       // Normal press released
       this.fancyLogger.logButton(
-        button + ' released' + (simulated ? ' (simulated)' : '')
+        button + ' released' + (simulated ? ' (simulated)' : ''),
       );
       this._handleButtonReleased(button, simulated);
     }
@@ -291,7 +311,7 @@ export default class TalkMachine {
    */
   dispatchButton(val, btn_state, simulated = false) {
     this.fancyLogger.logButton(
-      val + ' ' + btn_state + (simulated ? ' (simulated)' : '')
+      val + ' ' + btn_state + (simulated ? ' (simulated)' : ''),
     );
   }
 
@@ -327,7 +347,7 @@ export default class TalkMachine {
     const led_color_code = this.colorLeds[led_color];
     const led_index_leading_zero = led_index < 10 ? '0' + led_index : led_index;
     this.sendCommandToUsb(
-      'L' + led_index_leading_zero + led_color_code + led_effect
+      'L' + led_index_leading_zero + led_color_code + led_effect,
     );
     this.ui.setLedState(led_index, led_color, led_effect);
   }
@@ -343,7 +363,7 @@ export default class TalkMachine {
       const led_color_code = this.colorLeds[led_color];
       const led_index_leading_zero = i < 10 ? '0' + i : i;
       this.sendCommandToUsb(
-        'L' + led_index_leading_zero + led_color_code + led_effect
+        'L' + led_index_leading_zero + led_color_code + led_effect,
       );
       this.ui.setLedState(i, led_color, led_effect);
     }
