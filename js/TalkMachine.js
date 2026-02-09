@@ -387,6 +387,7 @@ export default class TalkMachine {
    * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
   ledsAllChangeColor(led_color, led_effect = 0) {
+    console.log('ledsAllChangeColor', led_color, led_effect);
     // Validate led_color
     if (!this.colorLeds[led_color]) {
       this.fancyLogger.logWarning(
@@ -402,6 +403,8 @@ export default class TalkMachine {
       );
       return;
     }
+
+    console.log('ledsAllChangeColor passed', led_color, led_effect);
 
     for (let i = 0; i < this.maxLeds; i++) {
       const led_color_code = this.colorLeds[led_color];

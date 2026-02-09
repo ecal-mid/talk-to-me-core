@@ -1,5 +1,5 @@
 /*********************************************************************
-  TALK TO ME - ECAL 2025 - AB.
+  TALK TO ME - ECAL 2026 - AB. - V6
   Serial communication via Web USB
   Some heplers functions for Buttons, Potentimeter, Leds
   All the logic is done on the Web side via javascript
@@ -120,9 +120,9 @@ void setLedPixel(String command)
     return;
   }
 
-  int led_index = command.substring(1, 2).toInt();  // 0-9
-  int color_code = command.substring(2, 4).toInt(); // 00 - 99
-  int led_effect = command.substring(4, 5).toInt(); // 0-9
+  int led_index = command.substring(1, 3).toInt();  // positions 1-2 (2 digits: 00-99)
+  int color_code = command.substring(3, 5).toInt(); // positions 3-4 (2 digits: 00-99)
+  int led_effect = command.substring(5, 6).toInt(); // position 5 (1 digit: 0-3)
 
   pixels.setPixelColor(led_index, colors[color_code]);
   allLedsPixels[led_index] = colors[color_code];
@@ -142,8 +142,9 @@ void setLedPixel(String command)
 void setLedPixelHEX(String command)
 {
 
-  int led_index = command.substring(1, 3).toInt(); // 0-99
-  String color_code = command.substring(3, 9);     // Hex rgb value
+  int led_index = command.substring(1, 3).toInt();   // positions 1-2 (2 digits: 00-99)
+  String color_code = command.substring(3, 9);       // positions 3-8 (6 hex chars: RRGGBB)
+  int led_effect = command.substring(9, 10).toInt(); // position 9 (1 digit: 0-3)
   if (led_index >= NUMPIXELS)
     return; // avoid offset
   // long number = (long)strtol(&color_code[1], NULL, 16);
@@ -154,6 +155,14 @@ void setLedPixelHEX(String command)
   pixels.setPixelColor(led_index, pixels.Color(r, g, b));
   allLedsPixels[led_index] = pixels.Color(r, g, b);
   ledMustBlink[led_index] = ledMustPulse[led_index] = ledMustPulseSpeak[led_index] = 0;
+
+  if (led_effect == 1)
+    ledMustBlink[led_index] = 1;
+  if (led_effect == 2)
+    ledMustPulse[led_index] = 1;
+  if (led_effect == 3)
+    ledMustPulseSpeak[led_index] = 1;
+
   pixels.show();
 }
 
@@ -280,15 +289,16 @@ void loop()
     String command = "";
     if (usb_web.available() > 6)
     {
-      // Led HEX message
-      char inputHEX[9];
-      usb_web.readBytes(inputHEX, 9);
+      // Led HEX message: H + 2digit_index + 6hex_color + 1digit_effect = 10 bytes
+      char inputHEX[10];
+      usb_web.readBytes(inputHEX, 10);
       command = String(inputHEX);
     }
     else
     {
-      char input[5];
-      usb_web.readBytes(input, 5);
+      // Led color message: L + 2digit_index + 2digit_color + 1digit_effect = 6 bytes
+      char input[6];
+      usb_web.readBytes(input, 6);
       command = String(input);
       // Serial.println(command);
     }
