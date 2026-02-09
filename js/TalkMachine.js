@@ -344,6 +344,34 @@ export default class TalkMachine {
    * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
   ledChangeColor(led_index, led_color, led_effect = 0) {
+    // Validate led_index
+    if (
+      typeof led_index !== 'number' ||
+      led_index < 0 ||
+      led_index >= this.maxLeds
+    ) {
+      this.fancyLogger.logWarning(
+        `Invalid led_index: ${led_index}. Must be between 0 and ${this.maxLeds - 1}`,
+      );
+      return;
+    }
+
+    // Validate led_color
+    if (!this.colorLeds[led_color]) {
+      this.fancyLogger.logWarning(
+        `Invalid led_color: ${led_color}. Valid colors: ${Object.keys(this.colorLeds).join(', ')}`,
+      );
+      return;
+    }
+
+    // Validate led_effect
+    if (typeof led_effect !== 'number' || led_effect < 0 || led_effect > 3) {
+      this.fancyLogger.logWarning(
+        `Invalid led_effect: ${led_effect}. Must be between 0 and 3`,
+      );
+      return;
+    }
+
     const led_color_code = this.colorLeds[led_color];
     const led_index_leading_zero = led_index < 10 ? '0' + led_index : led_index;
     this.sendCommandToUsb(
@@ -359,6 +387,22 @@ export default class TalkMachine {
    * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
   ledsAllChangeColor(led_color, led_effect = 0) {
+    // Validate led_color
+    if (!this.colorLeds[led_color]) {
+      this.fancyLogger.logWarning(
+        `Invalid led_color: ${led_color}. Valid colors: ${Object.keys(this.colorLeds).join(', ')}`,
+      );
+      return;
+    }
+
+    // Validate led_effect
+    if (typeof led_effect !== 'number' || led_effect < 0 || led_effect > 3) {
+      this.fancyLogger.logWarning(
+        `Invalid led_effect: ${led_effect}. Must be between 0 and 3`,
+      );
+      return;
+    }
+
     for (let i = 0; i < this.maxLeds; i++) {
       const led_color_code = this.colorLeds[led_color];
       const led_index_leading_zero = i < 10 ? '0' + i : i;
@@ -388,6 +432,46 @@ export default class TalkMachine {
    * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
   ledChangeRGB(led_index = 0, r = 255, g = 255, b = 255, led_effect = 0) {
+    // Validate led_index
+    if (
+      typeof led_index !== 'number' ||
+      led_index < 0 ||
+      led_index >= this.maxLeds
+    ) {
+      this.fancyLogger.logWarning(
+        `Invalid led_index: ${led_index}. Must be between 0 and ${this.maxLeds - 1}`,
+      );
+      return;
+    }
+
+    // Validate RGB values
+    if (typeof r !== 'number' || r < 0 || r > 255) {
+      this.fancyLogger.logWarning(
+        `Invalid red value: ${r}. Must be between 0 and 255`,
+      );
+      return;
+    }
+    if (typeof g !== 'number' || g < 0 || g > 255) {
+      this.fancyLogger.logWarning(
+        `Invalid green value: ${g}. Must be between 0 and 255`,
+      );
+      return;
+    }
+    if (typeof b !== 'number' || b < 0 || b > 255) {
+      this.fancyLogger.logWarning(
+        `Invalid blue value: ${b}. Must be between 0 and 255`,
+      );
+      return;
+    }
+
+    // Validate led_effect
+    if (typeof led_effect !== 'number' || led_effect < 0 || led_effect > 3) {
+      this.fancyLogger.logWarning(
+        `Invalid led_effect: ${led_effect}. Must be between 0 and 3`,
+      );
+      return;
+    }
+
     let led_index_zeroed;
     if (led_index < 10) {
       led_index_zeroed = '0' + led_index;
@@ -416,6 +500,34 @@ export default class TalkMachine {
    * @param {number} led_effect - Effect number (0: static, 1: blink, 2: pulse, 3: vibrate)
    */
   ledsAllChangeRGB(r = 255, g = 255, b = 255, led_effect = 0) {
+    // Validate RGB values
+    if (typeof r !== 'number' || r < 0 || r > 255) {
+      this.fancyLogger.logWarning(
+        `Invalid red value: ${r}. Must be between 0 and 255`,
+      );
+      return;
+    }
+    if (typeof g !== 'number' || g < 0 || g > 255) {
+      this.fancyLogger.logWarning(
+        `Invalid green value: ${g}. Must be between 0 and 255`,
+      );
+      return;
+    }
+    if (typeof b !== 'number' || b < 0 || b > 255) {
+      this.fancyLogger.logWarning(
+        `Invalid blue value: ${b}. Must be between 0 and 255`,
+      );
+      return;
+    }
+
+    // Validate led_effect
+    if (typeof led_effect !== 'number' || led_effect < 0 || led_effect > 3) {
+      this.fancyLogger.logWarning(
+        `Invalid led_effect: ${led_effect}. Must be between 0 and 3`,
+      );
+      return;
+    }
+
     r = r.toString(16);
     g = g.toString(16);
     b = b.toString(16);
